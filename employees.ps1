@@ -1,4 +1,3 @@
-
 # קובץ שבו נשמור את נתוני העובדים
 $employeesFile = "employees.json"
 
@@ -91,14 +90,19 @@ do {
     Write-Host "4. מחיקת עובד לפי מזהה"
     Write-Host "5. יציאה"
     Write-Host "==============================="
-    
+
     $choice = Read-Host "בחר אפשרות (1-5)"
 
     switch ($choice) {
         "1" {
             $name = Read-Host "הכנס שם העובד"
             $position = Read-Host "הכנס תפקיד"
-            $salary = Read-Host "הכנס שכר"
+            
+            # בדיקה שהשכר שהוזן הוא מספר חוקי
+            do {
+                $salary = Read-Host "הכנס שכר (מספר בלבד)"
+            } while (-not ($salary -match '^\d+$'))
+
             Add-Employee -Name $name -Position $position -Salary $salary
         }
         "2" { Show-Employees }
@@ -108,11 +112,21 @@ do {
         }
         "4" {
             $idToRemove = Read-Host "הכנס מזהה עובד למחיקה"
-            Remove-Employee -ID $idToRemove
+            
+            # בדיקה שהמזהה שהוזן הוא מספר חוקי
+            if ($idToRemove -match '^\d+$') {
+                Remove-Employee -ID [int]$idToRemove
+            } else {
+                Write-Host "❌ מזהה חייב להיות מספר!" -ForegroundColor Red
+            }
         }
-        "5" { Write-Host "👋 יציאה..." }
+        "5" { 
+            Write-Host "👋 יציאה..."
+            break  # יציאה מהלולאה
+        }
         default { Write-Host "❌ בחירה לא חוקית, נסה שוב!" -ForegroundColor Red }
     }
     
     Pause
-} while ($choice -ne "5")
+} while ($true)  # לולאה שרצה עד שמשתמש בוחר "יציאה"
+
